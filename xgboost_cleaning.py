@@ -60,9 +60,8 @@ def xgboost_print_mae_mre(num_of_consecutive_rows, target_data_point, target_col
     if new_source:
         miss_df = read_dataset(source_file)
         full_df = delete_missing_data(miss_df)
-        flattened_data_df = flatten_data_and_store_it(full_df, num_of_consecutive_rows, flattened_file)
-    else:
-        flattened_data_df = pd.read_csv(flattened_file)
+        flatten_data_and_store_it(full_df, num_of_consecutive_rows, flattened_file)
+    flattened_data_df = pd.read_csv(flattened_file)
     train_data_df, test_data_df = create_train_test_data(flattened_data_df.copy())
 
     orig_col_size = int(train_data_df.shape[1] / num_of_consecutive_rows)
@@ -150,13 +149,15 @@ def create_train_test_human_activity(flattened_data_df):
 def create_num_cols_human_activity(num_of_consecutive_rows, orig_col_size):
     num_cols = []
     for i in range(0, num_of_consecutive_rows * orig_col_size):
-        if i % 8 != 2 or i % 8 != 3 or i % 8 != 0:
+        if i % 7 != 2 and i % 7 != 3 and i % 7 != 0:
             num_cols.append(str(i))
     return num_cols
 
 
 def read_dataset_human_activity(source_file):
     df = pd.read_csv(source_file)
+    df = df.drop(['date', 'sequence_name'], axis=1)
+    df = df.iloc[0:int(df.shape[0]*1/10), :]
     return df
 
 
@@ -165,6 +166,6 @@ if __name__ == '__main__':
                           create_train_test_air_quality, create_num_cols_air_quality, read_dataset_air_quality, 0)
     # xgboost_print_mae_mre(10, 4, 1, 'stock10k.data', './stock_flattened_data.csv', 0,
     #                       create_train_test_stock, create_num_cols_stock, read_dataset_stock, 1)
-    # xgboost_print_mae_mre(5, 4, 6, './ConfLongDemo_JSI.txt', './human_flattened_data.csv', 0,
+    # xgboost_print_mae_mre(10, 4, 5, './ConfLongDemo_JSI.txt', './human_flattened_data.csv', 0,
     #                       create_train_test_human_activity, create_num_cols_human_activity, read_dataset_human_activity,
     #                       0)
