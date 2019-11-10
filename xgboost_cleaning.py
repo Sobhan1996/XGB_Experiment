@@ -145,9 +145,9 @@ def create_num_cols_human_activity(num_of_consecutive_rows, orig_col_size):
     return num_cols
 
 if __name__ == '__main__':
-    # xgboost_print_mae_mre(10, 4, 5, './PRSA_data_2010.1.1-2014.12.31.csv', './flattened_data.csv', 0,
-    #                       create_train_test_air_quality, create_num_cols_air_quality, 0)
+    xgboost_print_mae_mre(10, 4, 5, './PRSA_data_2010.1.1-2014.12.31.csv', './flattened_data.csv', 0,
+                          create_train_test_air_quality, create_num_cols_air_quality, 0)
     # xgboost_print_mae_mre(10, 4, 1, 'stock10k.data', './stock_flattened_data.csv', 0,
     #                       create_train_test_stock, create_num_cols_stock, 1)
-    xgboost_print_mae_mre(5, 4, 6, './ConfLongDemo_JSI.txt', './human_flattened_data.csv', 0,
-                          create_train_test_human_activity, create_num_cols_human_activity, 0)
+    # xgboost_print_mae_mre(5, 4, 6, './ConfLongDemo_JSI.txt', './human_flattened_data.csv', 0,
+    #                       create_train_test_human_activity, create_num_cols_human_activity, 0)
