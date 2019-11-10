@@ -131,8 +131,23 @@ def create_num_cols_air_quality(num_of_consecutive_rows, orig_col_size):
     return num_cols
 
 
+def create_train_test_human_activity(flattened_data_df):
+    train_data_df = flattened_data_df.iloc[0:int(flattened_data_df.shape[0]*8/10), :]
+    test_data_df = flattened_data_df.iloc[int(flattened_data_df.shape[0]*8/10):flattened_data_df.shape[0], :]
+    return train_data_df, test_data_df
+
+
+def create_num_cols_human_activity(num_of_consecutive_rows, orig_col_size):
+    num_cols = []
+    for i in range(0, num_of_consecutive_rows * orig_col_size):
+        if i % 8 != 2 or i % 8 != 3 or i % 8 != 0:
+            num_cols.append(str(i))
+    return num_cols
+
 if __name__ == '__main__':
     # xgboost_print_mae_mre(10, 4, 5, './PRSA_data_2010.1.1-2014.12.31.csv', './flattened_data.csv', 0,
     #                       create_train_test_air_quality, create_num_cols_air_quality, 0)
-    xgboost_print_mae_mre(10, 4, 1, 'stock10k.data', './stock_flattened_data.csv', 0,
-                          create_train_test_stock, create_num_cols_stock, 1)
+    # xgboost_print_mae_mre(10, 4, 1, 'stock10k.data', './stock_flattened_data.csv', 0,
+    #                       create_train_test_stock, create_num_cols_stock, 1)
+    xgboost_print_mae_mre(5, 4, 6, './ConfLongDemo_JSI.txt', './human_flattened_data.csv', 0,
+                          create_train_test_human_activity, create_num_cols_human_activity, 0)
