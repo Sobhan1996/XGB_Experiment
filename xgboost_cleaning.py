@@ -56,9 +56,9 @@ def run_xgboost(train_df, test_df, cols, num_cols=[], dump_fpath=None, **xgb_kwa
 
 
 def xgboost_print_mae_mre(num_of_consecutive_rows, target_data_point, target_column, source_file, flattened_file,
-                          new_source, create_train_test_data, creat_num_cols, stock_dataset):
+                          new_source, create_train_test_data, creat_num_cols, read_dataset, stock_dataset):
     if new_source:
-        miss_df = pd.read_csv(source_file)
+        miss_df = read_dataset(source_file)
         full_df = delete_missing_data(miss_df)
         flattened_data_df = flatten_data_and_store_it(full_df, num_of_consecutive_rows, flattened_file)
     else:
@@ -117,6 +117,11 @@ def create_num_cols_stock(num_of_consecutive_rows, orig_col_size):
     return num_cols
 
 
+def read_dataset_stock(source_file):
+    df = pd.read_csv(source_file)
+    return df
+
+
 def create_train_test_air_quality(flattened_data_df):
     train_data_df = flattened_data_df.loc[flattened_data_df['2'].isin([1, 2, 4, 5, 7, 8, 10, 11])]
     test_data_df = flattened_data_df.loc[flattened_data_df['2'].isin([3, 6, 9, 12])]
@@ -129,6 +134,11 @@ def create_num_cols_air_quality(num_of_consecutive_rows, orig_col_size):
         if i % 13 != 9:
             num_cols.append(str(i))
     return num_cols
+
+
+def read_dataset_air_quality(source_file):
+    df = pd.read_csv(source_file)
+    return df
 
 
 def create_train_test_human_activity(flattened_data_df):
@@ -144,10 +154,17 @@ def create_num_cols_human_activity(num_of_consecutive_rows, orig_col_size):
             num_cols.append(str(i))
     return num_cols
 
+
+def read_dataset_human_activity(source_file):
+    df = pd.read_csv(source_file)
+    return df
+
+
 if __name__ == '__main__':
     xgboost_print_mae_mre(10, 4, 5, './PRSA_data_2010.1.1-2014.12.31.csv', './flattened_data.csv', 0,
-                          create_train_test_air_quality, create_num_cols_air_quality, 0)
+                          create_train_test_air_quality, create_num_cols_air_quality, read_dataset_air_quality, 0)
     # xgboost_print_mae_mre(10, 4, 1, 'stock10k.data', './stock_flattened_data.csv', 0,
-    #                       create_train_test_stock, create_num_cols_stock, 1)
+    #                       create_train_test_stock, create_num_cols_stock, read_dataset_stock, 1)
     # xgboost_print_mae_mre(5, 4, 6, './ConfLongDemo_JSI.txt', './human_flattened_data.csv', 0,
-    #                       create_train_test_human_activity, create_num_cols_human_activity, 0)
+    #                       create_train_test_human_activity, create_num_cols_human_activity, read_dataset_human_activity,
+    #                       0)
