@@ -56,19 +56,33 @@ def run_xgboost(train_df, test_df, cols, num_cols=[], dump_fpath=None, **xgb_kwa
 
 
 def xgboost_print_mae_mre(num_of_consecutive_rows, target_data_point, target_column, source_file, flattened_file,
-                          new_source, create_train_test_data, creat_num_cols):
+                          new_source, create_train_test_data, creat_num_cols, stock_dataset):
     if new_source:
         miss_df = pd.read_csv(source_file)
         full_df = delete_missing_data(miss_df)
         flattened_data_df = flatten_data_and_store_it(full_df, num_of_consecutive_rows, flattened_file)
     else:
         flattened_data_df = pd.read_csv(flattened_file)
-    train_data_df, test_data_df = create_train_test_data(flattened_data_df)
+    train_data_df, test_data_df = create_train_test_data(flattened_data_df.copy())
 
-    orig_col_size = int(flattened_data_df.shape[1] / num_of_consecutive_rows)
+    orig_col_size = int(train_data_df.shape[1] / num_of_consecutive_rows)
     num_cols = creat_num_cols(num_of_consecutive_rows, orig_col_size)
     target_cols = [str(target_data_point * orig_col_size + target_column)]
     all_preds_df = run_xgboost(train_data_df, test_data_df, target_cols, num_cols)
+    if stock_dataset:
+        observed_cols = [0]
+        num_of_cols = flattened_data_df.shape[1]
+        for i in range(0, num_of_cols):
+            if i % 3 == 2:
+                observed_cols.append(i)
+        test_data_df = flattened_data_df.copy()
+        test_data_df.drop(test_data_df.columns[observed_cols], axis=1, inplace=True)
+        new_cols = []
+        for i in range(0, test_data_df.shape[1]):
+            new_cols.append(str(i))
+        test_data_df.columns = new_cols
+        test_data_df = test_data_df.iloc[int(test_data_df.shape[0]*8/10):test_data_df.shape[0], :]
+
     joined_df = pd.concat([test_data_df[target_cols].reset_index(drop=True), all_preds_df['inferred_val']], axis=1)
     joined_df['distance'] = joined_df.apply(lambda row: abs(row[target_cols] - row.inferred_val), axis=1)
     test_data_size = joined_df.shape[0]
@@ -118,7 +132,7 @@ def create_num_cols_air_quality(num_of_consecutive_rows, orig_col_size):
 
 
 if __name__ == '__main__':
-    xgboost_print_mae_mre(10, 4, 5, './PRSA_data_2010.1.1-2014.12.31.csv', './flattened_data.csv', 0,
-                          create_train_test_air_quality, create_num_cols_air_quality)
-    # xgboost_print_mae_mre(10, 4, 1, 'stock10k.data', './stock_flattened_data.csv', 0,
-    #                       create_train_test_stock, create_num_cols_air_quality)
+    # xgboost_print_mae_mre(10, 4, 5, './PRSA_data_2010.1.1-2014.12.31.csv', './flattened_data.csv', 0,
+    #                       create_train_test_air_quality, create_num_cols_air_quality, 0)
+    xgboost_print_mae_mre(10, 4, 1, 'stock10k.data', './stock_flattened_data.csv', 0,
+                          create_train_test_stock, create_num_cols_stock, 1)
