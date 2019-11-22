@@ -91,6 +91,8 @@ def xgboost_print_mae_mre(num_of_consecutive_rows, target_data_point, target_col
     print(joined_df)
     print('MAE: ' + str(mae))
     print('MRE: ' + str(mre[target_cols[0]]))
+    joined_df.to_csv('./joined_df.txt')
+
 
 
 def create_train_test_stock(flattened_data_df):
@@ -162,10 +164,10 @@ def read_dataset_human_activity(source_file):
 
 
 if __name__ == '__main__':
-    xgboost_print_mae_mre(10, 4, 5, './PRSA_data_2010.1.1-2014.12.31.csv', './flattened_data.csv', 0,
-                          create_train_test_air_quality, create_num_cols_air_quality, read_dataset_air_quality, 0)
-    # xgboost_print_mae_mre(10, 4, 1, 'stock10k.data', './stock_flattened_data.csv', 0,
-    #                       create_train_test_stock, create_num_cols_stock, read_dataset_stock, 1)
+    # xgboost_print_mae_mre(10, 4, 5, './PRSA_data_2010.1.1-2014.12.31.csv', './flattened_data.csv', 0,
+    #                       create_train_test_air_quality, create_num_cols_air_quality, read_dataset_air_quality, 0)
+    xgboost_print_mae_mre(10, 4, 1, 'stock10k.data', './stock_flattened_data.csv', 0,
+                          create_train_test_stock, create_num_cols_stock, read_dataset_stock, 1)
     # xgboost_print_mae_mre(10, 4, 5, './ConfLongDemo_JSI.txt', './human_flattened_data.csv', 0,
     #                       create_train_test_human_activity, create_num_cols_human_activity, read_dataset_human_activity,
     #                       0)
