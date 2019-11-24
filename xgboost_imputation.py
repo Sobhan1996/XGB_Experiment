@@ -110,22 +110,17 @@ def count_ones_in_columns(masks):
     counts = []
     for i in range(0, masks.shape[1]):
         count = np.count_nonzero(masks[:, i])
-        counts.append(count)
+        counts.append(max(1, count))
     return counts
 
 
 dataset = UCIDataset(11, 'PRSA_data_2010.1.1-2014.12.31.csv', [5], 'all_eval_masks.txt')
 
 columns_ones = count_ones_in_columns(dataset.eval_masks)
-columns_ones = [float(dataset.evals.shape[0]) / max(1, x) for x in columns_ones]
+eval_imputed_diff = np.multiply(np.abs(dataset.evals - dataset.imputations), dataset.eval_masks)
 
-nan_indexes = np.isnan(dataset.evals)
-dataset.evals[nan_indexes] = 0
-
-print('\n')
-print('MAE', np.multiply(np.abs(dataset.evals - dataset.imputations).mean(axis=0), columns_ones))
-print('MRE', np.abs(dataset.evals - dataset.imputations).sum(axis=0) / np.abs(dataset.evals[np.where(dataset.eval_masks == 1)]).sum(axis=0))
-
+print('MAE', np.divide(np.nansum(eval_imputed_diff, axis=0), columns_ones))
+print('MRE', np.divide(np.nansum(eval_imputed_diff, axis=0), np.nansum(np.multiply(np.abs(dataset.evals), dataset.eval_masks), axis=0)))
 
 plt.plot(dataset.evals[0:200, 5], 'r')
 plt.plot(dataset.imputations[0:200, 5], 'b')
